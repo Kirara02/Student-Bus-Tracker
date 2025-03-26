@@ -3,7 +3,9 @@ package com.uniguard.bustracker.ui.screens.main
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
@@ -16,6 +18,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,7 +46,7 @@ fun MainScreen(
         ) {
             Icon(
                 imageVector = Icons.Default.Settings,
-                contentDescription = "Settings",
+                contentDescription = stringResource(R.string.settings),
                 tint = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.size(32.dp)
             )
@@ -58,7 +61,7 @@ fun MainScreen(
         ) {
             // Title at the top
             Text(
-                text = "BUS ATTENDANCE SYSTEM",
+                text = stringResource(R.string.main_title),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.secondary,
@@ -71,7 +74,7 @@ fun MainScreen(
             // Info text at the bottom
             Spacer(modifier = Modifier.height(24.dp))
             Text(
-                text = "Please scan your NFC card to record attendance",
+                text = stringResource(R.string.scan_instruction),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -236,9 +239,50 @@ private fun ProfileSection(viewModel: MainViewModel) {
                     .padding(end = 16.dp),
                 horizontalAlignment = Alignment.Start
             ) {
+                // Today's date at the top
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.7f),
+                    modifier = Modifier.align(Alignment.End)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Calendar icon
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_calendar),
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                            tint = MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                        
+                        Spacer(modifier = Modifier.width(6.dp))
+                        
+                        // Date label
+                        Text(
+                            text = stringResource(R.string.date_label) + ": ",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                        
+                        // Actual date
+                        Text(
+                            text = java.text.SimpleDateFormat("EEEE, dd MMMM yyyy", java.util.Locale.getDefault())
+                                .format(java.util.Date()),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(12.dp))
+                
                 // Header for attendance
                 Text(
-                    text = "ATTENDANCE RECORD",
+                    text = stringResource(R.string.attendance_record),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.secondary
@@ -248,7 +292,7 @@ private fun ProfileSection(viewModel: MainViewModel) {
                 
                 // Profile Name (using NFC ID)
                 Text(
-                    text = if (isNfcDetected) "ID: $nfcId" else "Scan NFC Card",
+                    text = if (isNfcDetected) stringResource(R.string.id_format, nfcId) else stringResource(R.string.scan_nfc_card),
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -270,7 +314,7 @@ private fun ProfileSection(viewModel: MainViewModel) {
                                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
                             ) {
                                 Text(
-                                    text = "✓ VERIFIED",
+                                    text = stringResource(R.string.verified),
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Medium,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -292,19 +336,38 @@ private fun ProfileSection(viewModel: MainViewModel) {
                         
                         Spacer(modifier = Modifier.width(16.dp))
                         
-                        // Current time as text
-                        Text(
-                            text = "Time: ${java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())}",
-                            fontSize = 18.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        // Current time as text - enhanced for better readability
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.7f),
+                            modifier = Modifier.padding(top = 4.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault())
+                                        .format(java.util.Date()),
+                                    fontSize = 22.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                                )
+                                
+                                Text(
+                                    text = stringResource(R.string.time_format).substringBefore(":"),
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
+                                )
+                            }
+                        }
                     } else {
                         Surface(
                             shape = RoundedCornerShape(24.dp),
                             color = MaterialTheme.colorScheme.surfaceVariant
                         ) {
                             Text(
-                                text = "WAITING FOR SCAN",
+                                text = stringResource(R.string.waiting_for_scan),
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Medium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
