@@ -18,6 +18,11 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            //noinspection ChromeOsAbiSupport
+            abiFilters += listOf("armeabi-v7a", "arm64-v8a")
+        }
     }
 
     buildTypes {
@@ -43,9 +48,35 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
     }
+
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+            excludes += listOf("**/x86/**", "**/x86_64/**")
+        }
+    }
+
+    sourceSets {
+        getByName("main") {
+            jni.srcDirs("src/main/jni")
+            jniLibs.srcDirs("libs")
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/jni/CMakeLists.txt")
+            version = "3.22.1"
+        }
+    }
+
+    // Add this to ensure native libraries are built
+    ndkVersion = "25.2.9519653"
 }
 
 dependencies {
+
+    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

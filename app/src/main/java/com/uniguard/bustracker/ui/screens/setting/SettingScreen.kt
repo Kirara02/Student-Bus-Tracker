@@ -13,9 +13,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -100,7 +97,7 @@ fun SettingScreen(
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-            
+
             Text(
                 text = stringResource(R.string.manage_settings),
                 fontSize = 16.sp,
@@ -150,7 +147,7 @@ fun SettingScreen(
                 onClick = {
                     viewModel.updateUrl(tempUrl)
                     viewModel.updateIdDevice(tempIdDevice)
-                    
+
                     // Show a snackbar or some form of feedback
                     // For now, just restart the app
                     restartApp(context)
@@ -173,9 +170,9 @@ fun SettingScreen(
                     fontWeight = FontWeight.Medium
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             // Cancel button
             OutlinedButton(
                 onClick = { navController.navigateUp() },
@@ -238,9 +235,9 @@ fun SettingCardWithDrawable(
                         modifier = Modifier.padding(8.dp)
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.width(12.dp))
-                
+
                 // Title and description
                 Column {
                     Text(
@@ -249,7 +246,7 @@ fun SettingCardWithDrawable(
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
-                    
+
                     Text(
                         text = description,
                         fontSize = 14.sp,
@@ -257,12 +254,12 @@ fun SettingCardWithDrawable(
                     )
                 }
             }
-            
-            Divider(
+
+            HorizontalDivider(
                 color = MaterialTheme.colorScheme.outlineVariant,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
-            
+
             // Content
             Box(modifier = Modifier.fillMaxWidth()) {
                 content()

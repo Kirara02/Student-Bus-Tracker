@@ -19,21 +19,34 @@ class MainViewModel @Inject constructor(
     private val application: Application,
 ) : ViewModel() {
 
-    private val _nfcId = MutableStateFlow<String>("")
-    val nfcId: StateFlow<String> = _nfcId.asStateFlow()
+    private val _displayText = MutableStateFlow<String>("")
+    val displayText: StateFlow<String> = _displayText.asStateFlow()
+    
+    private val _mStr = MutableStateFlow<String>("")
+    val mStr: StateFlow<String> = _mStr.asStateFlow()
     
     private var resetJob: Job? = null
 
-    fun updateNfcId(id: String) {
-        _nfcId.value = id
-        
+    private fun startResetTimer() {
         // Cancel previous reset job if it exists
         resetJob?.cancel()
         
         // Start a new reset job
         resetJob = viewModelScope.launch {
             delay(3000) // 3 seconds delay
-            _nfcId.value = "" // Clear the NFC ID
+            _displayText.value = "" // Clear the display text
+            _mStr.value = "" // Clear the mStr as well
         }
+    }
+
+    fun updateNfcId(id: String) {
+        _displayText.value = id
+        startResetTimer()
+    }
+
+    fun updateBarcodeInfo(barcode: String, stdd: String) {
+        _displayText.value = barcode
+        _mStr.value = "barcode length: ${barcode.length},md5sum:$stdd"
+        startResetTimer()
     }
 }

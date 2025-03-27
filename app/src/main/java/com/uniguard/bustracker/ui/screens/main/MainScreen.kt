@@ -20,6 +20,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -32,6 +33,9 @@ fun MainScreen(
     navController: NavController,
     viewModel: MainViewModel = hiltViewModel()
 ) {
+    val mStr by viewModel.mStr.collectAsState()
+    val displayText by viewModel.displayText.collectAsState()
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -48,9 +52,9 @@ fun MainScreen(
                 imageVector = Icons.Default.Settings,
                 contentDescription = stringResource(R.string.settings),
                 tint = MaterialTheme.colorScheme.secondary,
-                modifier = Modifier.size(32.dp)
             )
         }
+
 
         // Main content centered in the screen
         Column(
@@ -67,7 +71,7 @@ fun MainScreen(
                 color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.padding(bottom = 24.dp)
             )
-            
+
             // Larger Profile Section
             ProfileSection(viewModel)
 
@@ -85,14 +89,14 @@ fun MainScreen(
 @Composable
 private fun ProfileSection(viewModel: MainViewModel) {
     val borderColor = MaterialTheme.colorScheme.secondary
-    val nfcId by viewModel.nfcId.collectAsState()
-    
+    val displayText by viewModel.displayText.collectAsState()
+
     // Get the primary color outside the Canvas scope
     val primaryColor = MaterialTheme.colorScheme.primary
-    
-    // Start countdown animation when NFC ID is detected
-    val isNfcDetected = nfcId.isNotEmpty()
-    
+
+    // Start countdown animation when displayText is not empty
+    val isNfcDetected = displayText.isNotEmpty()
+
     // Animation for countdown
     val countdownAnimation = remember(isNfcDetected) {
         if (isNfcDetected) {
@@ -101,8 +105,8 @@ private fun ProfileSection(viewModel: MainViewModel) {
             Animatable(0f)
         }
     }
-    
-    // Effect to animate countdown when NFC is detected
+
+    // Effect to animate countdown when displayText is not empty
     LaunchedEffect(isNfcDetected) {
         if (isNfcDetected) {
             countdownAnimation.snapTo(1f)
@@ -114,7 +118,7 @@ private fun ProfileSection(viewModel: MainViewModel) {
             countdownAnimation.snapTo(0f)
         }
     }
-    
+
     // Use person placeholder image instead of random internet image
     val painter = painterResource(id = R.drawable.profile_placeholder)
 
@@ -159,30 +163,31 @@ private fun ProfileSection(viewModel: MainViewModel) {
                         .fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
-                
-                // Countdown indicator - only shown when NFC is detected
+
+                // Countdown indicator - only shown when displayText is not empty
                 if (isNfcDetected) {
-                    Canvas(modifier = Modifier
-                        .fillMaxSize()
+                    Canvas(
+                        modifier = Modifier
+                            .fillMaxSize()
                     ) {
                         // Get dimensions of the canvas
                         val width = size.width
                         val height = size.height
-                        
+
                         // Draw countdown border with thinner stroke
                         val strokeWidth = 4f
-                        
+
                         // Use the color extracted outside the Canvas with transparency
                         val lineColor = primaryColor.copy(alpha = 0.7f)
-                        
+
                         // Calculate how much of each side to draw based on countdown progress
                         val progress = countdownAnimation.value
                         val totalLength = (width + height) * 2
                         val currentLength = totalLength * progress
-                        
+
                         // Draw the square border progressively
                         val pathStroke = Stroke(width = strokeWidth, cap = StrokeCap.Butt)
-                        
+
                         // Top edge
                         if (currentLength > 0) {
                             val topLength = minOf(width, currentLength)
@@ -193,7 +198,7 @@ private fun ProfileSection(viewModel: MainViewModel) {
                                 strokeWidth = strokeWidth
                             )
                         }
-                        
+
                         // Right edge
                         if (currentLength > width) {
                             val rightLength = minOf(height, currentLength - width)
@@ -204,18 +209,21 @@ private fun ProfileSection(viewModel: MainViewModel) {
                                 strokeWidth = strokeWidth
                             )
                         }
-                        
+
                         // Bottom edge
                         if (currentLength > width + height) {
                             val bottomLength = minOf(width, currentLength - width - height)
                             drawLine(
                                 color = lineColor,
                                 start = androidx.compose.ui.geometry.Offset(width, height),
-                                end = androidx.compose.ui.geometry.Offset(width - bottomLength, height),
+                                end = androidx.compose.ui.geometry.Offset(
+                                    width - bottomLength,
+                                    height
+                                ),
                                 strokeWidth = strokeWidth
                             )
                         }
-                        
+
                         // Left edge
                         if (currentLength > width + height + width) {
                             val leftLength = minOf(height, currentLength - width - height - width)
@@ -256,9 +264,9 @@ private fun ProfileSection(viewModel: MainViewModel) {
                             modifier = Modifier.size(16.dp),
                             tint = MaterialTheme.colorScheme.onTertiaryContainer
                         )
-                        
+
                         Spacer(modifier = Modifier.width(6.dp))
-                        
+
                         // Date label
                         Text(
                             text = stringResource(R.string.date_label) + ": ",
@@ -266,10 +274,13 @@ private fun ProfileSection(viewModel: MainViewModel) {
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onTertiaryContainer
                         )
-                        
+
                         // Actual date
                         Text(
-                            text = java.text.SimpleDateFormat("EEEE, dd MMMM yyyy", java.util.Locale.getDefault())
+                            text = java.text.SimpleDateFormat(
+                                "EEEE, dd MMMM yyyy",
+                                java.util.Locale.getDefault()
+                            )
                                 .format(java.util.Date()),
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium,
@@ -277,9 +288,9 @@ private fun ProfileSection(viewModel: MainViewModel) {
                         )
                     }
                 }
-                
+
                 Spacer(modifier = Modifier.height(12.dp))
-                
+
                 // Header for attendance
                 Text(
                     text = stringResource(R.string.attendance_record),
@@ -287,15 +298,19 @@ private fun ProfileSection(viewModel: MainViewModel) {
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.secondary
                 )
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
-                
-                // Profile Name (using NFC ID)
+
+                // Profile Name (using displayText)
                 Text(
-                    text = if (isNfcDetected) stringResource(R.string.id_format, nfcId) else stringResource(R.string.scan_nfc_card),
+                    text = if (isNfcDetected)
+                        displayText
+                    else stringResource(R.string.scan_nfc_card),
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -319,7 +334,7 @@ private fun ProfileSection(viewModel: MainViewModel) {
                                     fontWeight = FontWeight.Medium,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer
                                 )
-                                
+
                                 // Display countdown seconds
                                 val remainingTime = (countdownAnimation.value * 3f).toInt() + 1
                                 if (remainingTime > 0) {
@@ -328,14 +343,16 @@ private fun ProfileSection(viewModel: MainViewModel) {
                                         text = "($remainingTime)",
                                         fontSize = 14.sp,
                                         fontWeight = FontWeight.Light,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f)
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(
+                                            alpha = 0.6f
+                                        )
                                     )
                                 }
                             }
                         }
-                        
+
                         Spacer(modifier = Modifier.width(16.dp))
-                        
+
                         // Current time as text - enhanced for better readability
                         Surface(
                             shape = RoundedCornerShape(12.dp),
@@ -347,17 +364,22 @@ private fun ProfileSection(viewModel: MainViewModel) {
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                    text = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault())
+                                    text = java.text.SimpleDateFormat(
+                                        "HH:mm:ss",
+                                        java.util.Locale.getDefault()
+                                    )
                                         .format(java.util.Date()),
                                     fontSize = 22.sp,
                                     fontWeight = FontWeight.SemiBold,
                                     color = MaterialTheme.colorScheme.onSecondaryContainer
                                 )
-                                
+
                                 Text(
                                     text = stringResource(R.string.time_format).substringBefore(":"),
                                     fontSize = 12.sp,
-                                    color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer.copy(
+                                        alpha = 0.7f
+                                    )
                                 )
                             }
                         }
