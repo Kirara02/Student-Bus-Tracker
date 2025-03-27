@@ -71,7 +71,7 @@ android {
     }
 
     // Add this to ensure native libraries are built
-    ndkVersion = "25.2.9519653"
+    ndkVersion = "27.2.12479018"
 }
 
 dependencies {
