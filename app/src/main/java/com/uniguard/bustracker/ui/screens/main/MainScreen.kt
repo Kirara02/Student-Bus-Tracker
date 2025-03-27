@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.uniguard.bustracker.R
 import com.uniguard.bustracker.ui.screens.main.viewmodel.MainViewModel
 
@@ -41,6 +42,29 @@ fun MainScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
+        // Logo and text at the top left
+        Row(
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .height(48.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.uniguard_logo),
+                contentDescription = "UniGuard Logo",
+                modifier = Modifier.size(48.dp)
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Text(
+                text = "UNIGUARD",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = MaterialTheme.colorScheme.secondary
+            )
+        }
+
         // Settings Icon for navigation
         IconButton(
             onClick = { navController.navigate("/setting") },
@@ -54,7 +78,6 @@ fun MainScreen(
                 tint = MaterialTheme.colorScheme.secondary,
             )
         }
-
 
         // Main content centered in the screen
         Column(
@@ -90,6 +113,7 @@ fun MainScreen(
 private fun ProfileSection(viewModel: MainViewModel) {
     val borderColor = MaterialTheme.colorScheme.secondary
     val displayText by viewModel.displayText.collectAsState()
+    val userData by viewModel.userData.collectAsState()
 
     // Get the primary color outside the Canvas scope
     val primaryColor = MaterialTheme.colorScheme.primary
@@ -118,9 +142,6 @@ private fun ProfileSection(viewModel: MainViewModel) {
             countdownAnimation.snapTo(0f)
         }
     }
-
-    // Use person placeholder image instead of random internet image
-    val painter = painterResource(id = R.drawable.profile_placeholder)
 
     Card(
         modifier = Modifier
@@ -155,20 +176,27 @@ private fun ProfileSection(viewModel: MainViewModel) {
                     )
                 }
 
-                // Profile Image from URL
-                Image(
-                    painter = painter,
-                    contentDescription = "Profile Image",
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
+                // Profile Image
+                if (userData?.imageUrl != null) {
+                    AsyncImage(
+                        model = userData?.imageUrl,
+                        contentDescription = "Profile Image",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(id = R.drawable.profile_placeholder),
+                        contentDescription = "Profile Image",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
 
                 // Countdown indicator - only shown when displayText is not empty
                 if (isNfcDetected) {
                     Canvas(
-                        modifier = Modifier
-                            .fillMaxSize()
+                        modifier = Modifier.fillMaxSize()
                     ) {
                         // Get dimensions of the canvas
                         val width = size.width
@@ -301,17 +329,29 @@ private fun ProfileSection(viewModel: MainViewModel) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Profile Name (using displayText)
+                // Profile Name (using user data if available)
                 Text(
-                    text = if (isNfcDetected)
-                        displayText
-                    else stringResource(R.string.scan_nfc_card),
+                    text = when {
+                        userData != null -> userData!!.name
+                        isNfcDetected -> displayText
+                        else -> stringResource(R.string.scan_nfc_card)
+                    },
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
+
+                // Email if available
+                userData?.email?.let { email ->
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = email,
+                        fontSize = 16.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -322,17 +362,26 @@ private fun ProfileSection(viewModel: MainViewModel) {
                     if (isNfcDetected) {
                         Surface(
                             shape = RoundedCornerShape(24.dp),
-                            color = MaterialTheme.colorScheme.primaryContainer
+                            color = if (userData != null)
+                                MaterialTheme.colorScheme.primaryContainer
+                            else
+                                MaterialTheme.colorScheme.errorContainer
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
                             ) {
                                 Text(
-                                    text = stringResource(R.string.verified),
+                                    text = if (userData != null)
+                                        stringResource(R.string.verified)
+                                    else
+                                        "User not found",
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Medium,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                    color = if (userData != null)
+                                        MaterialTheme.colorScheme.onPrimaryContainer
+                                    else
+                                        MaterialTheme.colorScheme.onErrorContainer
                                 )
 
                                 // Display countdown seconds
@@ -343,9 +392,10 @@ private fun ProfileSection(viewModel: MainViewModel) {
                                         text = "($remainingTime)",
                                         fontSize = 14.sp,
                                         fontWeight = FontWeight.Light,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(
-                                            alpha = 0.6f
-                                        )
+                                        color = if (userData != null)
+                                            MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f)
+                                        else
+                                            MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.6f)
                                     )
                                 }
                             }

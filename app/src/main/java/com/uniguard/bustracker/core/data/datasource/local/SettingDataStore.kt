@@ -18,9 +18,9 @@ class SettingDataStore(
     companion object {
         private val URL_KEY = stringPreferencesKey("url")
         private val ID_DEVICE_KEY = stringPreferencesKey("id_device")
-        
+
         // Default values
-        private const val DEFAULT_URL = "http://localhost"
+        private const val DEFAULT_URL = "http://192.168.1.116:3000"
         private const val DEFAULT_ID_DEVICE = ""
     }
 

@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -67,7 +68,7 @@ fun SettingScreen(
         var tempIdDevice by remember { mutableStateOf("") }
         var isSaveEnabled by remember { mutableStateOf(false) }
 
-        val url by viewModel.url.collectAsState(initial = "http://localhost")
+        val url by viewModel.url.collectAsState(initial = "http://192.168.1.116:3000")
         val idDevice by viewModel.idDevice.collectAsState(initial = "")
 
         // Update temp values when state from ViewModel changes
@@ -118,7 +119,8 @@ fun SettingScreen(
                         value = tempUrl,
                         onValueChange = { tempUrl = it },
                         label = stringResource(R.string.server_url_label),
-                        hint = stringResource(R.string.server_url_hint)
+                        hint = stringResource(R.string.server_url_hint),
+                        keyboardType = KeyboardType.Uri
                     )
                 }
             )
