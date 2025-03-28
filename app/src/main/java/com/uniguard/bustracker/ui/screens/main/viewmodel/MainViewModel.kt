@@ -37,7 +37,7 @@ class MainViewModel @Inject constructor(
 
         // Start a new reset job
         resetJob = viewModelScope.launch {
-            delay(5000) // 5 seconds delay
+            delay(10000) // 10 seconds delay
             _displayText.value = "" // Clear the display text
             _mStr.value = "" // Clear the mStr as well
             _userData.value = null
@@ -45,14 +45,20 @@ class MainViewModel @Inject constructor(
     }
 
     fun updateNfcId(id: String) {
+        // Cancel any existing reset timer
+        resetJob?.cancel()
         _displayText.value = id
+        _userData.value = null // Reset user data immediately
         fetchUserData(id)
         startResetTimer()
     }
 
     fun updateBarcodeInfo(barcode: String, stdd: String) {
+        // Cancel any existing reset timer
+        resetJob?.cancel()
         _displayText.value = barcode
         _mStr.value = "barcode length: ${barcode.length},md5sum:$stdd"
+        _userData.value = null // Reset user data immediately
         fetchUserData(barcode)
         startResetTimer()
     }

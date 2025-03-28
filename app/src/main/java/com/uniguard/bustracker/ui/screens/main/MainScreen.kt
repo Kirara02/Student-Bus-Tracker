@@ -131,12 +131,12 @@ private fun ProfileSection(viewModel: MainViewModel) {
     }
 
     // Effect to animate countdown when displayText is not empty
-    LaunchedEffect(isNfcDetected) {
-        if (isNfcDetected) {
+    LaunchedEffect(displayText) {
+        if (displayText.isNotEmpty()) {
             countdownAnimation.snapTo(1f)
             countdownAnimation.animateTo(
                 targetValue = 0f,
-                animationSpec = tween(durationMillis = 3000, easing = LinearEasing)
+                animationSpec = tween(durationMillis = 10000, easing = LinearEasing)
             )
         } else {
             countdownAnimation.snapTo(0f)
@@ -172,7 +172,7 @@ private fun ProfileSection(viewModel: MainViewModel) {
                 Canvas(modifier = Modifier.fillMaxSize()) {
                     drawRect(
                         color = borderColor,
-                        style = Stroke(width = 5f)
+                        style = Stroke(width = 3f)
                     )
                 }
 
@@ -333,7 +333,7 @@ private fun ProfileSection(viewModel: MainViewModel) {
                 Text(
                     text = when {
                         userData != null -> userData!!.name
-                        isNfcDetected -> displayText
+                        isNfcDetected && userData == null -> displayText
                         else -> stringResource(R.string.scan_nfc_card)
                     },
                     fontSize = 30.sp,
@@ -385,7 +385,7 @@ private fun ProfileSection(viewModel: MainViewModel) {
                                 )
 
                                 // Display countdown seconds
-                                val remainingTime = (countdownAnimation.value * 3f).toInt() + 1
+                                val remainingTime = (countdownAnimation.value * 10f).toInt() + 1
                                 if (remainingTime > 0) {
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(

@@ -108,12 +108,12 @@ dependencies {
     // Hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
-    implementation("androidx.hilt:hilt-navigation-compose:1.0.0") {
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0") {
         exclude("androidx.lifecycle", "lifecycle-viewmodel-ktx")
     }
     kapt(libs.androidx.hilt.compiler)
 
     // Coil for image loading
-    implementation("io.coil-kt:coil-compose:2.5.0")
+    implementation(libs.coil.compose)
 
 }
