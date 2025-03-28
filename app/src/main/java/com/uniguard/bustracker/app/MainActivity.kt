@@ -128,23 +128,17 @@ class MainActivity : ComponentActivity(), ScanGunKeyEventHelper.OnScanSuccessLis
 
     @SuppressLint("RestrictedApi")
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-        val current = System.currentTimeMillis()
-        if (current - begin_time > 1000) {
-            begin_time = System.currentTimeMillis()
-            Log.d(
-                "ca1",
-                "name:" + event.device.name + ",vid:" + Integer.toHexString(event.device.vendorId) + ",pid:" + Integer.toHexString(
-                    event.device.productId
-                )
-            )
-        }
-
+        // Only process if it's a scan gun event
         if (mScanGunKeyEventHelper.isScanGunEvent(event)) {
             from_hid = true
+            mScanGunKeyEventHelper.analysisKeyEvent(event)
+            return true
         }
-        mScanGunKeyEventHelper.analysisKeyEvent(event)
-        return true
+
+        // For normal keyboard input, let the system handle it
+        return super.dispatchKeyEvent(event)
     }
+
 
     override fun onScanSuccess(barcode: String?) {
         var current = System.currentTimeMillis()

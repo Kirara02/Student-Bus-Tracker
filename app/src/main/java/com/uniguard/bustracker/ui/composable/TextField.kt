@@ -7,6 +7,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.input.TextInputService
+import androidx.compose.ui.text.input.TextInputSession
 
 @Composable
 fun TextField(
@@ -15,7 +21,8 @@ fun TextField(
     value: String,
     hint: String,
     onValueChange: (String) -> Unit,
-    keyboardType: KeyboardType = KeyboardType.Text
+    keyboardType: KeyboardType = KeyboardType.Text,
+    imeAction: ImeAction = ImeAction.Next
 ) {
     OutlinedTextField(
         modifier = modifier.fillMaxWidth(),
@@ -23,6 +30,14 @@ fun TextField(
         onValueChange = onValueChange,
         label = { Text(label) },
         placeholder = { Text(hint) },
-        keyboardOptions = KeyboardOptions(keyboardType = keyboardType)
+        keyboardOptions = KeyboardOptions(
+            keyboardType = keyboardType,
+            imeAction = imeAction
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = { /* Handle done action if needed */ }
+        ),
+        singleLine = true,
+        visualTransformation = VisualTransformation.None
     )
 }

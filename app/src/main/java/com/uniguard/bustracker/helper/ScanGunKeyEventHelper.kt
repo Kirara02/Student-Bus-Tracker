@@ -25,32 +25,7 @@ class ScanGunKeyEventHelper(private val onScanSuccessListener: OnScanSuccessList
      * @param event
      */
     fun analysisKeyEvent(event: KeyEvent) {
-        if (event.action == KeyEvent.ACTION_DOWN) {
-            val currentTime = System.currentTimeMillis()
-
-            // Reset barcode if too much time has passed since last key
-            if (currentTime - lastKeyTime > SCAN_TIMEOUT) {
-                barcodeBuilder.setLength(0)
-            }
-
-            lastKeyTime = currentTime
-
-            // Get the key character
-            val keyChar = event.unicodeChar.toChar()
-
-            // Add to barcode if it's a printable character
-            if (keyChar.isLetterOrDigit() || keyChar == '-' || keyChar == '_') {
-                barcodeBuilder.append(keyChar)
-            }
-
-            // Check if this is the end of the barcode (usually Enter key)
-            if (event.keyCode == KeyEvent.KEYCODE_ENTER && barcodeBuilder.isNotEmpty()) {
-                val barcode = barcodeBuilder.toString()
-                Log.d(TAG, "Barcode scanned: $barcode")
-                Scanner_Tools.getUtil().onDataReceived(barcode.toByteArray(), barcode.length, 0)
-                barcodeBuilder.setLength(0)
-            }
-        }
+       
     }
 
     interface OnScanSuccessListener {
@@ -62,13 +37,18 @@ class ScanGunKeyEventHelper(private val onScanSuccessListener: OnScanSuccessList
     }
 
     fun isScanGunEvent(event: KeyEvent): Boolean {
+        // Check if the event is from a scan gun by checking the device name and vendor ID
+        val deviceName = event.device?.name ?: return false
+        val vendorId = event.device?.vendorId ?: return false
+        
         // Log the device info for debugging
-        Log.d(TAG, "Device: ${event.device.name}, " +
-                "VID: ${Integer.toHexString(event.device.vendorId)}, " +
-                "PID: ${Integer.toHexString(event.device.productId)}")
-
-        // You can add specific device checks here if needed
-        // For now, we'll accept all keyboard events
-        return true
+        Log.d(TAG, "Device: name=$deviceName, vendorId=$vendorId")
+        
+        // Return true only if it's from a known scan gun device
+        // You may need to adjust these values based on your specific scan gun
+        return deviceName.contains("scanner", ignoreCase = true) || 
+               deviceName.contains("barcode", ignoreCase = true) ||
+               vendorId == 0x0483 || // Example vendor ID for a common scan gun
+               vendorId == 0x0482
     }
 } 

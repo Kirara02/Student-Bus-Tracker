@@ -140,7 +140,8 @@ fun SettingScreen(
                         value = tempIdDevice,
                         onValueChange = { tempIdDevice = it },
                         label = stringResource(R.string.device_id_label),
-                        hint = stringResource(R.string.device_id_hint)
+                        hint = stringResource(R.string.device_id_hint),
+                        keyboardType = KeyboardType.Text
                     )
                 }
             )
