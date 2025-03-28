@@ -162,7 +162,7 @@ class MainActivity : ComponentActivity(), ScanGunKeyEventHelper.OnScanSuccessLis
         val stdd = str + PasswdUtils.getMd5(cleanBarcode)
 
         runOnUiThread {
-            mainViewModel.updateBarcodeInfo(cleanBarcode, stdd)
+            mainViewModel.updateBarcodeInfo(cleanBarcode)
             // Reset from_hid flag after successful scan
             from_hid = false
         }

@@ -1,9 +1,12 @@
 package com.uniguard.bustracker.ui.screens.main.viewmodel
 
+import android.location.Location
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.uniguard.bustracker.core.data.datasource.local.SettingDataStore
 import com.uniguard.bustracker.core.data.model.User
+import com.uniguard.bustracker.core.data.model.request.UserLocationRequest
 import com.uniguard.bustracker.core.domain.usecase.GetUserByUidUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -23,13 +26,15 @@ class MainViewModel @Inject constructor(
     private val _displayText = MutableStateFlow("")
     val displayText: StateFlow<String> = _displayText.asStateFlow()
 
-    private val _mStr = MutableStateFlow("")
-    val mStr: StateFlow<String> = _mStr.asStateFlow()
-
     private val _userData = MutableStateFlow<User?>(null)
     val userData: StateFlow<User?> = _userData.asStateFlow()
 
     private var resetJob: Job? = null
+
+
+    override fun onCleared() {
+        super.onCleared()
+    }
 
     private fun startResetTimer() {
         // Cancel previous reset job if it exists
@@ -39,7 +44,6 @@ class MainViewModel @Inject constructor(
         resetJob = viewModelScope.launch {
             delay(10000) // 10 seconds delay
             _displayText.value = "" // Clear the display text
-            _mStr.value = "" // Clear the mStr as well
             _userData.value = null
         }
     }
@@ -49,28 +53,28 @@ class MainViewModel @Inject constructor(
         resetJob?.cancel()
         _displayText.value = id
         _userData.value = null // Reset user data immediately
-        fetchUserData(id)
+        fetchUserData(id, 106.8456, -6.2088)
         startResetTimer()
     }
 
-    fun updateBarcodeInfo(barcode: String, stdd: String) {
+    fun updateBarcodeInfo(barcode: String) {
         // Cancel any existing reset timer
         resetJob?.cancel()
         _displayText.value = barcode
-        _mStr.value = "barcode length: ${barcode.length},md5sum:$stdd"
         _userData.value = null // Reset user data immediately
-        fetchUserData(barcode)
+        fetchUserData(barcode, 106.8456, -6.2088)
         startResetTimer()
     }
 
-    private fun fetchUserData(uid: String) {
+    private fun fetchUserData(uid: String, latitude: Double, longitude: Double) {
         viewModelScope.launch {
             try {
-                getUserByUidUseCase.execute(uid).collect { user ->
+                val request = UserLocationRequest(uid, latitude, longitude)
+                getUserByUidUseCase.execute(request).collect { user ->
                     _userData.value = user
                 }
             } catch (e: Exception) {
-                _mStr.value = "Error: ${e.message}"
+                Log.e("fetchUserData", e.message.toString())
             }
         }
     }

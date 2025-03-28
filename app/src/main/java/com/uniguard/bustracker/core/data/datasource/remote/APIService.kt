@@ -1,10 +1,11 @@
 package com.uniguard.bustracker.core.data.datasource.remote
 
 import com.uniguard.bustracker.core.data.model.User
-import retrofit2.http.GET
-import retrofit2.http.Path
+import com.uniguard.bustracker.core.data.model.request.UserLocationRequest
+import retrofit2.http.Body
+import retrofit2.http.POST
 
 interface APIService {
-    @GET("api/users/{uid}")
-    suspend fun getUserByUid(@Path("uid") uid: String): User
+    @POST("api/user-location")
+    suspend fun getUserByUid(@Body request: UserLocationRequest): User
 }
