@@ -26,6 +26,9 @@ import androidx.navigation.NavController
 import com.uniguard.bustracker.R
 import com.uniguard.bustracker.ui.composable.TextField
 import com.uniguard.bustracker.ui.screens.setting.viewmodel.SettingViewModel
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -147,12 +150,15 @@ fun SettingScreen(
             // Save Button
             Button(
                 onClick = {
+                    // Launch a coroutine to handle the updates
                     viewModel.updateUrl(tempUrl)
                     viewModel.updateIdDevice(tempIdDevice)
 
-                    // Show a snackbar or some form of feedback
-                    // For now, just restart the app
-                    restartApp(context)
+                    // Add a small delay to ensure updates are completed
+                    MainScope().launch {
+                        delay(500) // Wait for 500ms to ensure updates are saved
+                        restartApp(context)
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth(0.7f)
