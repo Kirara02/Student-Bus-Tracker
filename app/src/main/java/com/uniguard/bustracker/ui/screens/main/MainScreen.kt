@@ -3,9 +3,7 @@ package com.uniguard.bustracker.ui.screens.main
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
@@ -13,8 +11,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -34,8 +30,6 @@ fun MainScreen(
     navController: NavController,
     viewModel: MainViewModel = hiltViewModel()
 ) {
-    val mStr by viewModel.mStr.collectAsState()
-    val displayText by viewModel.displayText.collectAsState()
 
     Box(
         modifier = Modifier
@@ -213,8 +207,6 @@ private fun ProfileSection(viewModel: MainViewModel) {
                         val totalLength = (width + height) * 2
                         val currentLength = totalLength * progress
 
-                        // Draw the square border progressively
-                        val pathStroke = Stroke(width = strokeWidth, cap = StrokeCap.Butt)
 
                         // Top edge
                         if (currentLength > 0) {

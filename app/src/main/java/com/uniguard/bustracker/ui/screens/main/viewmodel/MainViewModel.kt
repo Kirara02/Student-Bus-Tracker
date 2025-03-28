@@ -20,10 +20,10 @@ class MainViewModel @Inject constructor(
     private val getUserByUidUseCase: GetUserByUidUseCase
 ) : ViewModel() {
 
-    private val _displayText = MutableStateFlow<String>("")
+    private val _displayText = MutableStateFlow("")
     val displayText: StateFlow<String> = _displayText.asStateFlow()
 
-    private val _mStr = MutableStateFlow<String>("")
+    private val _mStr = MutableStateFlow("")
     val mStr: StateFlow<String> = _mStr.asStateFlow()
 
     private val _userData = MutableStateFlow<User?>(null)
